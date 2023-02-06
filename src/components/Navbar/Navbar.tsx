@@ -5,6 +5,7 @@ import RightContent from './RightContent/RightContent';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth } from '@/firebase/clientApp';
 import Directory from './Directory/Directory';
+import Link from 'next/link';
 
 const Navbar: React.FC = () => {
   const [user, loading, error] = useAuthState(auth);
@@ -20,7 +21,9 @@ const Navbar: React.FC = () => {
         width={{ base: '40px', md: 'auto' }}
         mr={{ base: 0, md: 2 }}
       >
-        <Image src='/images/redditFace.svg' height='30px' alt='reddit-face' />
+        <Link href={`/`}>
+          <Image src='/images/redditFace.svg' height='30px' alt='reddit-face' />
+        </Link>
         <Image
           src='/images/redditText.svg'
           height='46px'
