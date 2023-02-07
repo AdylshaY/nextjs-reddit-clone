@@ -94,13 +94,12 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
           }
         );
       });
-      router.push(`/r/${communityName}`);
-      handleClose();
     } catch (error: any) {
       console.log('handleCreateCommunity error', error);
       setError(error.message);
     }
-
+    router.push(`/r/${communityName}`);
+    handleClose();
     setLoading(false);
   };
 
