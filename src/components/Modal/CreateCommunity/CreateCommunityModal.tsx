@@ -23,6 +23,7 @@ import {
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore';
+import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { BsFillEyeFill, BsFillPersonFill } from 'react-icons/bs';
@@ -43,6 +44,7 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
   const [communityType, setCommunityType] = useState('public');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.value.length > 21) return;
@@ -80,7 +82,7 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
         transaction.set(communityDocRef, {
           creatorId: user?.uid,
           createdAt: serverTimestamp(),
-          numberOfMember: 1,
+          numberOfMembers: 1,
           privacyType: communityType,
         });
 
@@ -92,6 +94,8 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
           }
         );
       });
+      router.push(`/r/${communityName}`);
+      handleClose();
     } catch (error: any) {
       console.log('handleCreateCommunity error', error);
       setError(error.message);

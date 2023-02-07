@@ -1,7 +1,15 @@
 import { Post } from '@/atoms/postAtom';
-import { Flex, Icon, Image, Stack, Text } from '@chakra-ui/react';
+import {
+  Flex,
+  Icon,
+  Image,
+  Skeleton,
+  Spinner,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import moment from 'moment';
-import React from 'react';
+import React, { useState } from 'react';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { BsChat, BsDot } from 'react-icons/bs';
 import { FaReddit } from 'react-icons/fa';
@@ -19,7 +27,7 @@ type PostItemProps = {
   userIsCreator: boolean;
   userVoteValue?: number;
   onVote: () => {};
-  onDeletePost: () => {};
+  onDeletePost: (post: Post) => Promise<boolean>;
   onSelectPost: () => void;
 };
 
@@ -31,6 +39,26 @@ const PostItem: React.FC<PostItemProps> = ({
   onSelectPost,
   onVote,
 }) => {
+  const [loadingImage, setLoadingImage] = useState(true);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleDelete = async () => {
+    setLoadingDelete(true);
+    try {
+      const success = await onDeletePost(post);
+
+      if (!success) {
+        throw new Error('Failed to delete post.');
+      }
+
+      console.log('post is deleted.');
+    } catch (error: any) {
+      setError(error.message);
+    }
+    setLoadingDelete(false);
+  };
+
   return (
     <Flex
       border='1px solid'
@@ -86,7 +114,15 @@ const PostItem: React.FC<PostItemProps> = ({
           <Text fontSize='10pt'>{post.body}</Text>
           {post.imageUrl && (
             <Flex justify='center' align='center' p={2}>
-              <Image src={post.imageUrl} maxHeight='460px' alt='post image' />
+              {loadingImage && (
+                <Skeleton height='200px' width='100%' borderRadius={4} />
+              )}
+              <Image
+                src={post.imageUrl}
+                maxHeight='460px'
+                alt='post image'
+                onLoad={() => setLoadingImage(false)}
+              />
             </Flex>
           )}
         </Stack>
@@ -128,11 +164,17 @@ const PostItem: React.FC<PostItemProps> = ({
               borderRadius={4}
               cursor='pointer'
               _hover={{ bg: 'gray.200' }}
-              onClick={onDeletePost}
+              onClick={handleDelete}
               color='red'
             >
-              <Icon as={AiOutlineDelete} mr={2} />
-              <Text fontSize='9pt'>Delete</Text>
+              {loadingDelete ? (
+                <Spinner size='sm' />
+              ) : (
+                <>
+                  <Icon as={AiOutlineDelete} mr={2} />
+                  <Text fontSize='9pt'>Delete</Text>
+                </>
+              )}
             </Flex>
           )}
         </Flex>
